@@ -85,7 +85,7 @@ Avoid fluff. Focus on clarity, brevity, and value.
 
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
                 max_tokens=500
