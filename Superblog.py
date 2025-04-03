@@ -2,65 +2,85 @@ import streamlit as st
 import openai
 import os
 
-# Set your OpenAI API key securely
+# Load OpenAI key securely
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
+# Streamlit page settings
 st.set_page_config(page_title="Superblog GPT", layout="centered")
 
-# Custom styling for mobile-friendly and elegant UI
+# Custom CSS for modern, clean UI
 st.markdown("""
     <style>
-        .main {
-            padding: 2rem;
+        body {
+            background-color: #f9fafb;
+            font-family: 'Segoe UI', sans-serif;
         }
         .block-container {
+            padding-top: 2rem;
             max-width: 700px;
             margin: auto;
         }
         h1 {
-            color: #2C3E50;
             text-align: center;
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
         }
-        .stTextArea textarea {
+        .stTextInput input, .stTextArea textarea {
             font-size: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+        .stButton>button {
+            font-size: 1rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
         }
         .linkedin-post {
-            background-color: #F4F6F6;
+            background-color: #ffffff;
             padding: 1.5rem;
             border-radius: 12px;
             font-size: 1.05rem;
             line-height: 1.6;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
             white-space: pre-wrap;
+            margin-top: 1.5rem;
         }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🚀 Superblog GPT for LinkedIn")
+# App Title
+st.title("Superblog GPT for LinkedIn")
 
-st.markdown("Generate high-impact, professional LinkedIn posts with a single topic.")
+# Instructions
+st.markdown("Craft short, sharp, and professional LinkedIn posts in seconds.")
 
-topic = st.text_input("🔍 Enter a Topic", placeholder="e.g., Remote leadership, AI in HR, Personal branding")
+# Input fields
+topic = st.text_input("💡 Topic", placeholder="e.g., Remote leadership, AI in HR, Personal branding")
 
-tone_options = ["Professional & Insightful", "Empathetic & Bold", "Thought-leader Style"]
-selected_tone = st.selectbox("🧠 Select Writing Style", tone_options)
+tone = st.selectbox("🧠 Tone of Voice", ["Professional", "Empathetic", "Thought-Leader"])
 
-submit = st.button("Generate LinkedIn Post")
+generate = st.button("✨ Generate Post")
 
-if submit and topic:
-    with st.spinner("Crafting your perfect LinkedIn post..."):
+# Generate Post
+if generate and topic:
+    with st.spinner("Writing your short, sharp LinkedIn post..."):
 
         prompt = f"""
-You are a GPT expert at writing high-engagement LinkedIn posts for professionals. Based on the topic below, write a professional and emotionally engaging LinkedIn article that includes:
+You are a GPT assistant that writes high-engagement LinkedIn posts for professionals.
 
-1. A **Compelling Headline** (no emojis).
-2. A **Professional and Relatable Tone** matching this style: {selected_tone}.
-3. A **Concise and Insightful Body** (max 300 words).
-4. Use of **bullet points** or → arrows where relevant for readability.
-5. A **Subtle Emotional Connection** through thoughtful phrasing.
-6. A **Strong Conclusion** with a takeaway or statement.
-7. Include **5–7 Relevant Hashtags** at the end (trending but relevant).
+Write a short LinkedIn post (80 to 100 words) on the topic: "{topic}"
+- Use a professional, engaging, and {tone.lower()} tone.
+- Start with a compelling headline (no emojis).
+- Use → arrows or bullet points for structure if needed.
+- Ensure it's human-like and relatable.
+- End with a strong closing line.
+- Include 5–7 relevant, trending hashtags at the end.
 
-**Topic**: {topic}
+Avoid fluff. Focus on clarity, brevity, and value.
 """
 
         try:
@@ -68,13 +88,13 @@ You are a GPT expert at writing high-engagement LinkedIn posts for professionals
                 model="gpt-4",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
-                max_tokens=600
+                max_tokens=500
             )
-            generated_post = response['choices'][0]['message']['content'].strip()
-            st.markdown("### ✨ Your LinkedIn Post")
-            st.markdown(f"<div class='linkedin-post'>{generated_post}</div>", unsafe_allow_html=True)
+            post = response['choices'][0]['message']['content'].strip()
+            st.markdown("### 📝 Your LinkedIn Post")
+            st.markdown(f"<div class='linkedin-post'>{post}</div>", unsafe_allow_html=True)
         except Exception as e:
-            st.error(f"❌ Failed to generate post: {e}")
+            st.error(f"Error: {e}")
 
-elif submit:
+elif generate:
     st.warning("Please enter a topic to generate your post.")
